@@ -7,10 +7,10 @@ CORS(app)  # Enable CORS for all routes
 
 # DB Config
 db_config = {
-    'host': '192.168.0.101',
-    'user': 'flaskapp',               # Your DB username
-    'password': 'your_password', # Your DB password
-    'database': 'your_database'              # Your DB name
+    'host': 'http://mysql.ns-o9qm0o1m.svc.cluster.local',
+    'user': 'root',               # Your DB username
+    'password': 'Unitec123', # Your DB password
+    'database': 'iscg7444'              # Your DB name
 }
 
 def get_db():
