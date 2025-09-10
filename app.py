@@ -7,7 +7,7 @@ CORS(app)  # Enable CORS for all routes
 
 # DB Config
 db_config = {
-    'host': 'http://mysql.ns-o9qm0o1m.svc.cluster.local',
+    'host': 'mysql.ns-o9qm0o1m.svc.cluster.local',
     'user': 'root',               # Your DB username
     'password': 'Unitec123', # Your DB password
     'database': 'iscg7444'              # Your DB name
