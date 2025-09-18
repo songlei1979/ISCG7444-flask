@@ -14,6 +14,7 @@ db_config = {
     'database': 'iscg7444'              # Your DB name
 }
 
+
 def get_db():
     return mysql.connector.connect(**db_config)
 
