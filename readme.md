@@ -1,151 +1,108 @@
+Flask API + MySQL on Render – README
 
-# ISCG7444 Flask App – Docker Deployment on Claw.Cloud Run
+# 📦 Flask API with MySQL on Render
 
-This project demonstrates how to package a Flask application using Docker and deploy it to [Claw.Cloud Run](https://run.claw.cloud), a cloud platform for running containerized apps.
-
----
-
-## 🧱 Step 1: Create Dockerfile
-
-Create a `Dockerfile` in the root of your Flask project directory with the following content:
-
-```Dockerfile
-# Use a lightweight Python base image
-FROM python:3.10-slim
-
-# Set working directory
-WORKDIR /app
-
-# Install Python dependencies
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Copy the app source code
-COPY . .
-
-# Expose the port Flask will run on
-EXPOSE 5000
-
-# Set environment variable for Flask
-ENV FLASK_APP=app.py
-
-# Start the Flask application
-CMD ["flask", "run", "--host=0.0.0.0", "--port=5000"]
-```
-
-### Explanation:
-- `FROM python:3.10-slim`: Uses a lightweight official Python base image.
-- `WORKDIR /app`: All files and commands will operate from `/app`.
-- `COPY requirements.txt .` and `RUN pip install`: Install dependencies.
-- `COPY . .`: Copies the entire project folder.
-- `EXPOSE 5000`: Makes the container's port 5000 available.
-- `CMD`: Starts the Flask server on 0.0.0.0:5000.
+This project is a simple Flask API that connects to a MySQL database. It supports full CRUD operations for a `students` table.
 
 ---
 
-## 🔐 Step 2: Docker Hub Login
+## 🧱 Step 1: Setup Project Structure
 
-You need to **log in to Docker Hub** to push your image:
-
-```bash
-docker login
-```
-
-> 🔐 If you use **Google to sign into Docker Hub**, you must [generate an Access Token](https://hub.docker.com/settings/security) and use it as your password.
-
----
-
-## 🛠️ Step 3: Build & Push Docker Image
-
-Use Docker Buildx to build the image for the correct architecture and push it to Docker Hub.
-
-```bash
-# Create builder (only once)
-docker buildx create --use
-
-# Build and push the image
-docker buildx build --platform linux/amd64   -t your_repository_name/iscg7444-flask:latest   --push .
-```
-
-Replace `your_repository_name` with your Docker Hub username.
-
----
-
-## 🚀 Step 4: Deploy to Claw.Cloud Run
-
-1. Visit: [https://run.claw.cloud](https://run.claw.cloud)
-2. Click **Create App**
-3. Choose **Deploy from Docker Image**
-4. Enter your image URL:
-
-   ```
-   docker.io/your_repository_name/iscg7444-flask:latest
-   ```
-
-5. Set **Container Port** to:
-
-   ```
-   5000
-   ```
-
-6. Under **Resource Limits**, configure:
-
-| Resource | Value   |
-|----------|---------|
-| CPU      | 0.1     |
-| Memory   | 128Mi   |
-
-7. Click **Deploy**
-
-> 📝 It may take a minute or two to pull the image and start the container.
-
----
-
-## 🌐 Step 5: Access Your App
-
-Once deployed, Claw.Cloud Run will provide you with a public URL like:
+Your file structure should look like this:
 
 ```
-https://your-app-name.run.claw.cloud
-```
-
-Visit it in your browser to confirm it's working.
-
----
-
-## 🧪 Step 6: Run Locally (Optional)
-
-To test locally before deploying:
-
-```bash
-docker run -p 5000:5000 your_repository_name/iscg7444-flask:latest
-```
-
-Then open: [http://localhost:5000](http://localhost:5000)
-
----
-
-## 📁 Example Project Structure
-
-```
-iscg7444-flask/
+.
 ├── app.py
+├── .env
+├── .gitignore
 ├── requirements.txt
-├── Dockerfile
-└── README.md
 ```
 
 ---
 
-## ✅ Requirements
+## 📜 Step 2: Create `.env`
 
-- Your `requirements.txt` must include `flask`.
-- The main file should be `app.py`, or update the `FLASK_APP` env variable in Dockerfile.
+Create a `.env` file to store your sensitive credentials. Example:
+
+```
+DB_HOST=tcp.ap-northeast-1.clawcloudrun.com
+DB_USER=root
+DB_PASSWORD=Unitec123
+DB_NAME=iscg7444
+DB_PORT=40910
+```
+
+> ⚠️ Never commit this file to version control!
 
 ---
 
-## 👩‍🏫 Author
+## 🚫 Step 3: Create `.gitignore`
 
-Lei Song  
-Senior Lecturer – Cloud Application Development  
-Unitec Institute of Technology  
+Create a `.gitignore` file and include:
+
+```
+.venv
+.env
+```
+
+---
+
+## ⚙️ Step 4: Update `app.py` to Use `.env`
+
+Replace hardcoded config with this:
+
+```python
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+db_config = {{
+    'host': os.getenv('DB_HOST'),
+    'user': os.getenv('DB_USER'),
+    'password': os.getenv('DB_PASSWORD'),
+    'database': os.getenv('DB_NAME'),
+    'port': os.getenv('DB_PORT')
+}}
+```
+
+---
+
+## 📦 Step 5: Create `requirements.txt`
+
+Install packages and freeze:
+
+```bash
+pip install flask flask-cors python-dotenv mysql-connector-python
+pip freeze > requirements.txt
+```
+
+---
+
+## 🚀 Step 6: Deploy on Render
+
+1. Go to [https://render.com](https://render.com) and create a **Web Service**.
+2. Connect your GitHub repository.
+3. Choose **Python** environment.
+4. Set **start command** to:
+
+```
+gunicorn app:app
+```
+
+5. Add **environmental variables** based on your `.env` file:
+
+```
+DB_HOST
+DB_USER
+DB_PASSWORD
+DB_NAME
+DB_PORT
+```
+
+6. Click **Deploy**.
+
+---
+
+✅ Done! Your Flask API with MySQL is now running on Render.
+
