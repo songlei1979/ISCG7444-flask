@@ -1,16 +1,22 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import mysql.connector
+import os
+from dotenv import load_dotenv
+
+# Load .env file
+load_dotenv()
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
 
-# DB Config
+# DB Config from .env
 db_config = {
-    'host': 'mysql.ns-o9qm0o1m.svc.cluster.local',
-    'user': 'root',               # Your DB username
-    'password': 'Unitec123', # Your DB password
-    'database': 'iscg7444'              # Your DB name
+    'host': os.getenv('DB_HOST'),
+    'user': os.getenv('DB_USER'),
+    'password': os.getenv('DB_PASSWORD'),
+    'database': os.getenv('DB_NAME'),
+    'port': os.getenv('DB_PORT')
 }
 
 def get_db():
