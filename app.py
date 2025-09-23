@@ -10,7 +10,7 @@ load_dotenv()
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
 
-# DB Config from .env
+# MySQL DB Config from .env
 db_config = {
     'host': os.getenv('DB_HOST'),
     'user': os.getenv('DB_USER'),
@@ -22,7 +22,8 @@ db_config = {
 def get_db():
     return mysql.connector.connect(**db_config)
 
-# GET /grades - list all grades
+# ---------------- MYSQL Routes ----------------
+
 @app.route('/grades', methods=['GET'])
 def grade_list():
     conn = get_db()
@@ -33,7 +34,6 @@ def grade_list():
     conn.close()
     return jsonify(result)
 
-# GET /grades/<id> - get one grade
 @app.route('/grades/<int:id>', methods=['GET'])
 def grade_detail(id):
     conn = get_db()
@@ -47,7 +47,6 @@ def grade_detail(id):
     else:
         return jsonify({'error': 'Grade not found'}), 404
 
-# POST /grades - add new grade
 @app.route('/grades', methods=['POST'])
 def grade_add():
     data = request.get_json()
@@ -64,7 +63,6 @@ def grade_add():
     conn.close()
     return jsonify({'id': new_id, 'name': name, 'grade': grade}), 201
 
-# PUT /grades/<id> - update grade
 @app.route('/grades/<int:id>', methods=['PUT'])
 def grade_update(id):
     data = request.get_json()
@@ -83,7 +81,6 @@ def grade_update(id):
         return jsonify({'error': 'Grade not found'}), 404
     return jsonify({'id': id, 'name': name, 'grade': grade})
 
-# DELETE /grades/<id> - delete grade
 @app.route('/grades/<int:id>', methods=['DELETE'])
 def grade_delete(id):
     conn = get_db()
@@ -97,6 +94,5 @@ def grade_delete(id):
         return jsonify({'error': 'Grade not found'}), 404
     return jsonify({'message': f'Grade with id {id} deleted'})
 
-# Main entry
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
